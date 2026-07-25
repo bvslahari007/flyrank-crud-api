@@ -66,3 +66,4 @@ def delete_task(task_id: int):
 			return
 	raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
 
+# tested with swagger ui
