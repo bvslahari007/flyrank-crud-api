@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+import sqlite3
+
 
 tasks = [
     {"id": 1, "title": "Complete WAF assignments", "done": False},
@@ -8,6 +10,21 @@ tasks = [
 ]
 
 app = FastAPI()
+
+conn = sqlite3.connect("tasks.db", check_same_thread=False)
+cursor = conn.cursor()
+
+cursor.execute("""
+	CREATE TABLE IF NOT EXISTS tasks(
+		id INTEGER PRIMARY KEY,
+		title TEXT,
+		done INTEGER
+	)
+""")
+
+cursor.execute("SELECT COUNT(*) FROM tasks")
+count = cursor.fetchone()[0]
+
 
 @app.get("/")
 def read_root(): 
