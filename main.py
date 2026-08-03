@@ -24,7 +24,11 @@ cursor.execute("""
 
 cursor.execute("SELECT COUNT(*) FROM tasks")
 count = cursor.fetchone()[0]
-
+if count == 0:
+	cursor.execute("INSERT INTO tasks (title, done) VALUES (?, ?)", ("Clean the table", 0))
+	cursor.execute("INSERT INTO tasks (title, done) VALUES (?, ?)", ("Complete WAF assignment", 0))
+	cursor.execute("INSERT INTO tasks (title, done) VALUES (?, ?)", ("CN Wireshark implementation", 0))
+	conn.commit()
 
 @app.get("/")
 def read_root(): 
