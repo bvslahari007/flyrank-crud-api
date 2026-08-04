@@ -67,3 +67,12 @@ git commit -m "message here"
 git push
 git pull origin main --rebase           # pull remote changes, replay local commits on top
                                           # (use when push is rejected due to remote history)
+
+## Stage 1 — reading from the database
+
+- Always let SQL do filtering with WHERE, not Python loops after fetchall()
+  (WHERE id = ? is efficient even with millions of rows; looping in Python isn't)
+- fetchone() returns None if no row matches — always check `if row is None`
+- Single-value tuples need a trailing comma: (task_id,) not (task_id)
+- Converting a raw row tuple to a dict: {"id": row[0], "title": row[1], "done": row[2]}
+  (row order matches your column order in the table)
