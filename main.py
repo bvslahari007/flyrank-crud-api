@@ -40,15 +40,21 @@ def health():
 
 @app.get("/tasks")
 def get_tasks():
-	return tasks
+	cursor.execute("SELECT * FROM tasks")
+	rows = cursor.fetchall()
+	result = []
+	for row in rows:
+		task = {"id": row[0], "title": row[1], "done": row[2]}
+		result.append(task)
+	return result
 
 @app.get("/tasks/{task_id}")
 def get_task(task_id: int):
-	for task in tasks:
-		if task['id'] == task_id:
-			return task
-	raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-
+	cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+	row = cursor.fetchone()
+	if row is None:
+		raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+	return {"id": row[0], "title": row[1], "done": row[2]}
 
 class TaskCreate(BaseModel):  #defines a shape called TaskCreatea
 	title: str #anything claiming to be this shape must have a field called title
