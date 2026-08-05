@@ -76,3 +76,12 @@ git pull origin main --rebase           # pull remote changes, replay local comm
 - Single-value tuples need a trailing comma: (task_id,) not (task_id)
 - Converting a raw row tuple to a dict: {"id": row[0], "title": row[1], "done": row[2]}
   (row order matches your column order in the table)
+
+## Stage 2 — creating rows
+
+- id is auto-assigned by SQLite (INTEGER PRIMARY KEY) - never calculate it yourself
+- After INSERT, get the new row's id with: cursor.lastrowid
+- conn.commit() is REQUIRED after any INSERT/UPDATE/DELETE, or the write 
+  never actually saves to disk - it'll look fine until you restart, then vanish
+- curl template for POST/PUT:
+  curl -i -X POST <url> -H "Content-Type: application/json" -d '{"key":"value"}'
