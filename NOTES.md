@@ -85,3 +85,14 @@ git pull origin main --rebase           # pull remote changes, replay local comm
   never actually saves to disk - it'll look fine until you restart, then vanish
 - curl template for POST/PUT:
   curl -i -X POST <url> -H "Content-Type: application/json" -d '{"key":"value"}'
+
+## Stage 3 — update & delete
+
+- PUT: fetch the row first (for 404 check + to know what "keep unchanged" 
+  values are), then UPDATE only the fields that were actually provided
+- DELETE with status_code=204 means "No Content" - the function should 
+  `return` with nothing, no body at all
+- Always fetch-then-check-then-modify for PUT/DELETE - never skip the 
+  existence check, since WHERE with no matching id just silently does nothing
+- Placeholders like <that_id> in instructions mean "fill in the real value" -
+  not literal text to type (bash reads < as a redirect operator!)
