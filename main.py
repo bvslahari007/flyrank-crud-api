@@ -61,13 +61,12 @@ class TaskCreate(BaseModel):  #defines a shape called TaskCreatea
 
 @app.post("/tasks", status_code=201)
 def create_task(new_task: TaskCreate):
-	if (new_task.title == ""):
-		raise HTTPException(status_code=400, detail="No task found to add")
-	else:
-		new_id = tasks[-1]['id'] + 1
-		new_task_dict = {"id":new_id, "title": new_task.title,"done":False}
-		tasks.append(new_task_dict)
-		return new_task_dict
+	if new_task.title == "":
+		raise HTTPException(status_code=400, detail="Task not mentioned properly")
+	cursor.execute("INSERT INTO tasks (title, done) VALUES (?, ?)", (new_task.title, 0))
+	conn.commit()
+	new_id = cursor.lastrowid
+	return {"id": new_id, "title": new_task.title, "done": 0}
 
 class TaskUpdate(BaseModel):
 	title: str | None = None
