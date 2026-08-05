@@ -74,22 +74,25 @@ class TaskUpdate(BaseModel):
 
 @app.put("/tasks/{task_id}")
 def update_task(task_id: int, up_task:TaskUpdate):
-	for task in tasks:
-		if task['id'] == task_id:
-			if up_task.title is not None:
-				task['title'] = up_task.title
-			if up_task.done is not None:
-				task['done'] = up_task.done
-			return task
-	raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+	cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+	row = cursor.fetchone()
+	if row is None:
+		raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+	new_title = up_task.title if up_task.title is not None else row[1]
+	new_done = up_task.done if up_task.done is not None else row[2]
 
+	cursor.execute("UPDATE tasks SET title = ?, done = ? WHERE id = ?", (new_title, new_done, task_id))
+	conn.commit()
+	return {"id": task_id, "title": new_title, "done": new_done}
 
 @app.delete("/tasks/{task_id}", status_code=204)
 def delete_task(task_id: int):
-	for task in tasks:
-		if task['id'] == task_id:
-			tasks.remove(task)
-			return
-	raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+	cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+	row = cursor.fetchone()
+	if row is None:
+		raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+	cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+	conn.commit()
+	return	
 
 # tested with swagger ui
