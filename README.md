@@ -1,89 +1,396 @@
-# Task API — CRUD Ops. (FlyRank W2 + W3 · A1 + A2)
+# Task API — CRUD Operations with FastAPI, PostgreSQL & Docker
 
-A small to-do list API built with **FastAPI** as part of the FlyRank Backend AI Engineering internship. Supports full CRUD (Create, Read, Update, Delete) on a task list, with interactive docs via Swagger UI.
+A simple Task Management API built with **FastAPI** as part of the **FlyRank Backend AI Engineering Internship**.
 
-This repo covers two assignments:
-- **W2 · A1** — built the CRUD API with tasks stored in an in-memory Python list.
-- **W3 · A2** — migrated storage from that in-memory list to a real **SQLite** database, so data now survives server restarts. The API itself, every endpoint, request, and response shape — stayed identical; only the storage layer underneath changed.
+This project demonstrates:
 
-## What this is
+- REST API development with FastAPI
+- Repository Pattern architecture
+- PostgreSQL integration
+- Docker and Docker Compose
+- Environment variable configuration using `.env`
+- Persistent data storage using Docker volumes
 
-This API manages a to-do list. You can create tasks, list them, fetch one by id, update a task's title and/or completion status, and delete a task i.e the four CRUD operations.
+---
 
-In A1, data lived only in memory and reset on every restart. As of A2, tasks are stored in `tasks.db`, a SQLite database file, so they persist across restarts.
+## Assignment Overview
 
-## How to run it
+### W2 · A1
 
-Requires Python 3.10+.
+Built a CRUD API using FastAPI with tasks stored in an in-memory Python list.
+
+### W3 · A2
+
+Replaced the in-memory storage with a PostgreSQL repository running inside Docker.
+
+The API routes and service layer remained unchanged. Only the repository implementation changed, demonstrating the benefits of layered architecture and separation of concerns.
+
+---
+
+## Features
+
+- Create tasks
+- View all tasks
+- View a task by ID
+- Update task title and completion status
+- Delete tasks
+- Health check endpoint
+- Interactive Swagger UI documentation
+- PostgreSQL persistence
+- Dockerized deployment
+
+---
+
+## Tech Stack
+
+- Python 3.12
+- FastAPI
+- PostgreSQL
+- Psycopg2
+- Docker
+- Docker Compose
+- Uvicorn
+- Python-dotenv
+
+---
+
+## Project Structure
+
+```text
+.
+├── main.py
+├── model.py
+├── repository.py
+├── init.sql
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── .env.example
+├── README.md
+└── NOTES.md
+```
+
+---
+
+## API Endpoints
+
+| Method | Endpoint           | Description     |
+| ------ | ------------------ | --------------- |
+| GET    | `/`                | API information |
+| GET    | `/health`          | Health check    |
+| GET    | `/tasks`           | Get all tasks   |
+| GET    | `/tasks/{task_id}` | Get task by ID  |
+| POST   | `/tasks`           | Create task     |
+| PUT    | `/tasks/{task_id}` | Update task     |
+| DELETE | `/tasks/{task_id}` | Delete task     |
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+DB_NAME=tasksdb
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_HOST=postgres
+DB_PORT=5432
+```
+
+The `.env` file is excluded from Git using `.gitignore`.
+
+An example configuration is provided in `.env.example`.
+
+---
+
+## Running the Project
+
+### Clone the Repository
 
 ```bash
-git clone https://github.com/bvslahari007/flyrank-crud-api
-cd first-crud-api
-python3 -m venv venv
-source venv/bin/activate
-pip install fastapi uvicorn
-uvicorn main:app --reload
+git clone https://github.com/bvslahari007/flyrank-crud-api.git
+cd flyrank-crud-api
 ```
 
-The server starts on **http://localhost:8000**. On first run, `tasks.db` and the `tasks` table are created automatically, and 3 example tasks are seeded.
-
-## Endpoints
-
-| Method | Path              | Description                          |
-|--------|-------------------|---------------------------------------|
-| GET    | `/`               | Describes the API                    |
-| GET    | `/health`         | Health check — confirms the server is alive |
-| GET    | `/tasks`          | List all tasks                       |
-| POST   | `/tasks`          | Create a new task                    |
-| GET    | `/tasks/{task_id}`| Get a single task by id              |
-| PUT    | `/tasks/{task_id}`| Update a task's title and/or done status |
-| DELETE | `/tasks/{task_id}`| Delete a task                        |
-
-## Example request
+### Start the Complete Stack
 
 ```bash
-curl -i -X POST http://localhost:8000/tasks -H "Content-Type: application/json" -d '{"title":"Buy milk"}'
+docker compose up --build
 ```
 
+This command starts:
+
+- PostgreSQL container
+- FastAPI application container
+
+---
+
+## Access the Application
+
+### API
+
+```text
+http://localhost:8000
 ```
-HTTP/1.1 201 Created
-content-type: application/json
 
-{"id":4,"title":"Buy milk","done":false}
+### Swagger UI
+
+```text
+http://localhost:8000/docs
 ```
 
-## Swagger UI
+### OpenAPI Schema
 
-Interactive docs are auto-generated by FastAPI at **http://localhost:8000/docs** every endpoint listed with a "Try it out" button to send real requests without curl.
+```text
+http://localhost:8000/openapi.json
+```
 
-<img width="1536" height="777" alt="image" src="https://github.com/user-attachments/assets/b779050f-ed8a-426d-8cfb-efd2b961a79d" />
-<img width="1098" height="731" alt="image" src="https://github.com/user-attachments/assets/333e6238-69fa-4413-9923-12b1382209af" />
-<img width="1164" height="666" alt="image" src="https://github.com/user-attachments/assets/1dfe2a15-ed59-4cab-9e57-e826fd9d4f56" />
-<img width="1164" height="666" alt="image" src="https://github.com/user-attachments/assets/37627149-b8d6-48cd-9878-68b3e5e2cd24" />
-<img width="980" height="733" alt="image" src="https://github.com/user-attachments/assets/831a1cac-dc4b-4e50-9149-757ad99ed03b" />
-<img width="1209" height="733" alt="image" src="https://github.com/user-attachments/assets/ad929d4c-fe26-4505-972a-0c784caa8138" />
-<img width="972" height="727" alt="image" src="https://github.com/user-attachments/assets/37ead848-ab3b-4721-a6f8-e074db58406c" />
-<img width="956" height="712" alt="image" src="https://github.com/user-attachments/assets/f7c0208e-6099-4270-9e23-2d2cce1fb4bd" />
+---
 
-## Database (added in A2)
+## Example Request
 
-This project stores tasks in **SQLite** instead of an in-memory list.
+### Create a Task
 
-**Why SQLite:** it requires no separate server or installation, the entire database is a single file (`tasks.db`), created automatically the first time the app runs. That makes it ideal for a small project like this: zero setup, and data survives server restarts.
+```bash
+curl -X POST http://localhost:8000/tasks \
+-H "Content-Type: application/json" \
+-d '{"title":"Submit Assignment 3"}'
+```
 
-**Where the database lives:** `tasks.db` in the project root. It's listed in `.gitignore`, so it's not committed to the repo — each fresh clone creates its own file automatically on first run, seeded with 3 example tasks.
+Response:
 
-**Example SQL query (run in DB Browser for SQLite):**
+```json
+{
+  "id": 1,
+  "title": "Submit Assignment 3",
+  "done": false
+}
+```
+
+---
+
+## Database
+
+This project uses **PostgreSQL** running inside a Docker container.
+
+The database is automatically initialized using `init.sql` during the first startup.
+
+### Tasks Table
+
 ```sql
-SELECT * FROM tasks WHERE done = 1;
+CREATE TABLE tasks (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    done BOOLEAN DEFAULT FALSE
+);
 ```
-This returned only the tasks marked as completed — confirming that `WHERE` filters rows based on a column's value, the same mechanism used by `WHERE id = ?` in the API's endpoints.
 
-<img width="728" height="777" alt="image" src="https://github.com/user-attachments/assets/9d40b48f-5b8b-4ed0-9223-7ba417bec6c7" />
-<img width="724" height="764" alt="image" src="https://github.com/user-attachments/assets/640f5531-d087-4ca6-97b3-78df1c19e859" />
+---
 
-## Notes
+## Repository Pattern
 
-- **A1 → A2 change:** tasks used to live only in memory and reset every restart. As of A2, they're stored in SQLite (`tasks.db`) and persist across restarts. The 3 example tasks are seeded only once, on first run, when the table is empty, restarting never duplicates them.
-- **Validation:** `POST`/`PUT` requests with a missing `title` field return `422` (FastAPI's built-in schema validation); requests with an empty-string `title` return `400` (custom validation in the endpoint).
-- All CRUD operations use parameterized SQL queries (`?` placeholders) to avoid SQL injection — no user input is ever glued directly into a query string.
+The application follows the Repository Pattern.
+
+The API routes and business logic do not directly interact with PostgreSQL.
+
+Instead, they communicate with a repository layer.
+
+### A1
+
+```text
+FastAPI
+   ↓
+In-Memory Repository
+```
+
+### A2
+
+```text
+FastAPI
+   ↓
+Postgres Repository
+   ↓
+PostgreSQL Database
+```
+
+Only the repository implementation changed.
+
+The API routes, request models, response models, and endpoint behavior remained unchanged.
+
+This demonstrates proper separation of concerns and storage independence.
+
+---
+
+## Docker Setup
+
+### PostgreSQL Container
+
+- Image: `postgres:17`
+- Persistent Docker volume attached
+- Environment variables configured through Docker Compose
+
+### FastAPI Container
+
+- Built from custom Dockerfile
+- Installs dependencies from `requirements.txt`
+- Runs using Uvicorn
+
+### Start Everything
+
+```bash
+docker compose up
+```
+
+### Stop Everything
+
+```bash
+docker compose down
+```
+
+---
+
+## Persistence Verification
+
+To verify database persistence:
+
+### Step 1
+
+Create a task:
+
+```bash
+POST /tasks
+```
+
+Response:
+
+```json
+{
+  "id": 1,
+  "title": "Submit Assignment 3",
+  "done": false
+}
+```
+
+### Step 2
+
+Confirm it exists:
+
+```bash
+GET /tasks
+```
+
+### Step 3
+
+Stop containers:
+
+```bash
+docker compose down
+```
+
+### Step 4
+
+Restart containers:
+
+```bash
+docker compose up
+```
+
+### Step 5
+
+Query tasks again:
+
+```bash
+GET /tasks
+```
+
+The previously created task still exists.
+
+This confirms that PostgreSQL data is stored in a Docker volume and survives application and container restarts.
+
+---
+
+## Validation & Error Handling
+
+The API uses:
+
+- FastAPI request validation
+- Pydantic models
+- HTTPException responses
+
+Examples:
+
+### Task Not Found
+
+```json
+{
+  "detail": "Task not found"
+}
+```
+
+### Invalid Request Body
+
+```json
+{
+  "detail": [
+    {
+      "msg": "Field required"
+    }
+  ]
+}
+```
+
+---
+
+## Screenshots
+
+### Swagger UI
+
+Add screenshots of:
+
+- GET /tasks
+- POST /tasks
+- PUT /tasks/{id}
+- DELETE /tasks/{id}
+- PostgreSQL container running
+- Docker Compose services
+
+---
+
+## Learning Outcomes
+
+Through this assignment I learned:
+
+- Building REST APIs using FastAPI
+- Using PostgreSQL from Python with psycopg2
+- Repository Pattern architecture
+- Managing configuration using environment variables
+- Containerizing applications using Docker
+- Running multi-container applications using Docker Compose
+- Persisting database data using Docker volumes
+- Connecting application and database containers through Docker networking
+
+---
+
+## Assignment Requirements Checklist
+
+- [x] PostgreSQL running in Docker
+- [x] Docker volume for persistent storage
+- [x] Connection configuration through `.env`
+- [x] `.env.example` committed
+- [x] PostgreSQL repository implementation
+- [x] Service and routes unchanged
+- [x] Docker Compose setup
+- [x] Entire stack starts with `docker compose up`
+- [x] Data persistence verified after restart
+
+---
+
+## Author
+
+**Vinaya Sangeeta Lahari Baswa**
+
+B.Tech Computer Science & Engineering  
+GITAM (Deemed to be University)
+
+FlyRank Backend AI Engineering Internship
