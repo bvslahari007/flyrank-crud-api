@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_DB: tasksdb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: satya@143
+      POSTGRES_PASSWORD: *****
 
     ports:
       - "5432:5432"
