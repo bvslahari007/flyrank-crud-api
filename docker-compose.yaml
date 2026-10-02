@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres_db
+
+    environment:
+      POSTGRES_DB: tasksdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: satya@143
+
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    container_name: flyrank_api
+
+    depends_on:
+      - postgres
+
+    env_file:
+      - .env
+
+    ports:
+      - "8000:8000"
